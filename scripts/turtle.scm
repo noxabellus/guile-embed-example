@@ -1,0 +1,7 @@
+(do ((i 0 (+ i 1)))
+    ((= i 10))
+  (move i 0))
+(move 10 10)
+(pen-down)
+(move 100 100)
+(pen-up)
