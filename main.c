@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include <libguile.h>
 
 typedef union {
@@ -66,9 +67,17 @@ void* register_functions (void* data) {
   return NULL;
 }
 
-int main (int argc, char** argv) {
-  scm_with_guile(&register_functions, NULL);
+
+SCM run_scm (void*) {
   scm_c_primitive_load("scripts/turtle.scm");
+
+  printf("loaded turtle.scm\n");
+
+  SCM var = scm_c_lookup("run-turtle");
+  SCM ref = scm_variable_ref(var);
+
+  scm_call_1(ref, scm_from_utf8_string("(input from C here)"));
+
   for (int i = 0; i < COMMANDS_LENGTH; i++) {
     Command cmd = COMMANDS[i];
     switch (cmd.type) {
@@ -83,5 +92,27 @@ int main (int argc, char** argv) {
         break;
     }
   }
+
+  return SCM_UNSPECIFIED;
+}
+
+SCM handle_exn (void*, SCM key, SCM args) {
+  SCM str = scm_symbol_to_string(key);
+  SCM str2 = scm_object_to_string(args, SCM_UNDEFINED);
+
+  char* key_s = scm_to_utf8_string(str);
+  char* args_s = scm_to_utf8_string(str2);
+
+  printf("'%s exception in script: %s\n", key_s, args_s);
+
+  exit(1);
+}
+
+int main (int argc, char** argv) {
+  scm_with_guile(&register_functions, NULL);
+
+
+  scm_c_catch(scm_from_bool(true), run_scm, NULL, NULL, NULL, handle_exn, NULL);
+  
   return 0;
 }
