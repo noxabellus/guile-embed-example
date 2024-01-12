@@ -6,11 +6,15 @@
 
 (define args (cdr (command-line)))
 
-(define build-cmd '(
-    gcc main.c
+(define build-cmd
+    '(gcc
+        src/main.c
+        src/glue-gl.c
         -o ./build/main
         -fPIC -pthread
         -lguile-3.0 -lgc -lpthread -ldl -lm
+        -lGL -lGLEW -lSDL2
+        -Isrc/include
         -I/usr/include/guile/3.0))
 
 (define (run) (shell:run (./build/main)))
