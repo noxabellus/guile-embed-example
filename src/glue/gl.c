@@ -3,7 +3,7 @@
 #include <libguile.h>
 
 #include "glue/gl.h"
-#include "glueing-utils.h"
+#include "glue/glueing-utils.h"
 
 
 char SHADER_INFO_LOG[SHADER_INFO_LOG_LENGTH] = {};
@@ -113,6 +113,9 @@ SCM glue_glBufferData (SCM target, SCM data, SCM usage) {
   if (inc_p != 1) scm_throw(scm_from_utf8_symbol("unsupported-gl-buffer-type"), scm_from_utf8_string("Only contiguous buffers are supported as of now"));
 
   glBufferData(scm_to_int(target), size, buffer, scm_to_int(usage));
+
+  scm_array_handle_release(&handle);
+  
   return SCM_UNSPECIFIED;
 }
 
@@ -140,6 +143,177 @@ SCM glue_glEnableVertexAttribArray (SCM index) {
 }
 
 
+SCM glue_glGetUniformLocation (SCM loc, SCM name) {
+  return scm_from_int(glGetUniformLocation(scm_to_int(loc), scm_to_utf8_string(name)));
+}
+
+
+SCM glue_glUniform1f (SCM loc, SCM f0) {
+  glUniform1f(scm_to_int(loc), scm_to_double(f0));
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniform2f (SCM loc, SCM f0, SCM f1) {
+  glUniform2f(scm_to_int(loc), scm_to_double(f0), scm_to_double(f1));
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniform3f (SCM loc, SCM f0, SCM f1, SCM f2) {
+  glUniform3f(scm_to_int(loc), scm_to_double(f0), scm_to_double(f1), scm_to_double(f2));
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniform4f (SCM loc, SCM f0, SCM f1, SCM f2, SCM f3) {
+  glUniform4f(scm_to_int(loc), scm_to_double(f0), scm_to_double(f1), scm_to_double(f2), scm_to_double(f3));
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniform1ui (SCM loc, SCM u0) {
+  glUniform1ui(scm_to_int(loc), scm_to_uint(u0));
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniform2ui (SCM loc, SCM u0, SCM u1) {
+  glUniform2ui(scm_to_int(loc), scm_to_uint(u0), scm_to_uint(u1));
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniform3ui (SCM loc, SCM u0, SCM u1, SCM u2) {
+  glUniform3ui(scm_to_int(loc), scm_to_uint(u0), scm_to_uint(u1), scm_to_uint(u2));
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniform4ui (SCM loc, SCM u0, SCM u1, SCM u2, SCM u3) {
+  glUniform4ui(scm_to_int(loc), scm_to_uint(u0), scm_to_uint(u1), scm_to_uint(u2), scm_to_uint(u3));
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniform1i (SCM loc, SCM u0) {
+  glUniform1i(scm_to_int(loc), scm_to_int(u0));
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniform2i (SCM loc, SCM u0, SCM u1) {
+  glUniform2i(scm_to_int(loc), scm_to_int(u0), scm_to_int(u1));
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniform3i (SCM loc, SCM u0, SCM u1, SCM u2) {
+  glUniform3i(scm_to_int(loc), scm_to_int(u0), scm_to_int(u1), scm_to_int(u2));
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniform4i (SCM loc, SCM u0, SCM u1, SCM u2, SCM u3) {
+  glUniform4i(scm_to_int(loc), scm_to_int(u0), scm_to_int(u1), scm_to_int(u2), scm_to_int(u3));
+  return SCM_UNSPECIFIED;
+}
+
+#define EXTRACT_UNI_BUFFER(type, body) { \
+    scm_t_array_handle handle; \
+    size_t len; \
+    const void* buffer; \
+    ssize_t inc_p; \
+    if (scm_##type##vector_p(data)) { \
+        buffer = scm_##type##vector_elements(data, &handle, &len, &inc_p); \
+    } else { \
+        scm_throw(scm_from_utf8_symbol("unsupported-gl-buffer-type"), scm_from_utf8_string("Expected an " #type "vector")); \
+    } \
+    if (inc_p != 1) scm_throw(scm_from_utf8_symbol("unsupported-gl-buffer-type"), scm_from_utf8_string("Only contiguous buffers are supported as of now")); \
+    body; \
+    scm_array_handle_release(&handle); \
+  }
+
+SCM glue_glUniform1fv (SCM loc, SCM data) {
+  EXTRACT_UNI_BUFFER(f32, glUniform1fv(scm_to_int(loc), len, buffer));
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniform2fv (SCM loc, SCM data) {
+  EXTRACT_UNI_BUFFER(f32, glUniform2fv(scm_to_int(loc), len / 2, buffer));
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniform3fv (SCM loc, SCM data) {
+  EXTRACT_UNI_BUFFER(f32, glUniform3fv(scm_to_int(loc), len / 3, buffer));
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniform4fv (SCM loc, SCM data) {
+  EXTRACT_UNI_BUFFER(f32, glUniform4fv(scm_to_int(loc), len / 4, buffer));
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniform1uiv (SCM loc, SCM data) {
+  EXTRACT_UNI_BUFFER(u32, glUniform1uiv(scm_to_int(loc), len, buffer));
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniform2uiv (SCM loc, SCM data) {
+  EXTRACT_UNI_BUFFER(u32, glUniform2uiv(scm_to_int(loc), len / 2, buffer));
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniform3uiv (SCM loc, SCM data) {
+  EXTRACT_UNI_BUFFER(u32, glUniform3uiv(scm_to_int(loc), len / 3, buffer));
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniform4uiv (SCM loc, SCM data) {
+  EXTRACT_UNI_BUFFER(u32, glUniform4uiv(scm_to_int(loc), len / 4, buffer));
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniform1iv (SCM loc, SCM data) {
+  EXTRACT_UNI_BUFFER(s32, glUniform1iv(scm_to_int(loc), len, buffer));
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniform2iv (SCM loc, SCM data) {
+  EXTRACT_UNI_BUFFER(s32, glUniform2iv(scm_to_int(loc), len / 2, buffer));
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniform3iv (SCM loc, SCM data) {
+  EXTRACT_UNI_BUFFER(s32, glUniform3iv(scm_to_int(loc), len / 3, buffer));
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniform4iv (SCM loc, SCM data) {
+  EXTRACT_UNI_BUFFER(s32, glUniform4iv(scm_to_int(loc), len / 4, buffer));
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniformMatrix3 (SCM loc, SCM transpose, SCM data) {
+  EXTRACT_UNI_BUFFER(f32, {
+      if (len != 9) scm_throw(scm_from_utf8_symbol("unsupported-gl-buffer-type"), scm_from_utf8_string("Expected a 3x3 matrix"));
+      glUniformMatrix3fv(scm_to_int(loc), 1, scm_to_bool(transpose), buffer);
+  });
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniformMatrix4 (SCM loc, SCM transpose, SCM data) {
+  EXTRACT_UNI_BUFFER(f32, {
+      if (len != 16) scm_throw(scm_from_utf8_symbol("unsupported-gl-buffer-type"), scm_from_utf8_string("Expected a 3x3 matrix"));
+      glUniformMatrix4fv(scm_to_int(loc), 1, scm_to_bool(transpose), buffer);
+  });
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniformMatrix3v (SCM loc, SCM transpose, SCM data) {
+  EXTRACT_UNI_BUFFER(f32, {
+      glUniformMatrix3fv(scm_to_int(loc), len / 9, scm_to_bool(transpose), buffer);
+  });
+  return SCM_UNSPECIFIED;
+}
+
+SCM glue_glUniformMatrix4v (SCM loc, SCM transpose, SCM data) {
+  EXTRACT_UNI_BUFFER(f32, {
+      glUniformMatrix4fv(scm_to_int(loc), len / 16, scm_to_bool(transpose), buffer);
+  });
+  return SCM_UNSPECIFIED;
+}
+
+
 
 SCM glue_glDrawArrays (SCM mode, SCM first, SCM count) {
   glDrawArrays(scm_to_int(mode), scm_to_int(first), scm_to_int(count));
@@ -147,8 +321,7 @@ SCM glue_glDrawArrays (SCM mode, SCM first, SCM count) {
 }
 
 
-
-void init_glue_gl (void*) {
+void bind_gl_glue (void* model) {
     EXPORT_CONSTANT("+float+", scm_from_int(GL_FLOAT));
     EXPORT_CONSTANT("+unsigned-int+", scm_from_int(GL_UNSIGNED_INT));
     EXPORT_CONSTANT("+int+", scm_from_int(GL_INT));
@@ -168,7 +341,6 @@ void init_glue_gl (void*) {
     EXPORT_CONSTANT("+color-buffer-bit+", scm_from_int(GL_COLOR_BUFFER_BIT));
     EXPORT_CONSTANT("+depth-buffer-bit+", scm_from_int(GL_DEPTH_BUFFER_BIT));
 
-
     EXPORT_PROCEDURE("clear-color", 4, 0, 0, glue_glClearColor);
     EXPORT_PROCEDURE("clear", 1, 0, 0, glue_glClear);
     
@@ -184,6 +356,40 @@ void init_glue_gl (void*) {
     EXPORT_PROCEDURE("bind-vertex-array", 1, 0, 0, glue_glBindVertexArray);
     EXPORT_PROCEDURE("vertex-attrib-pointer", 5, 0, 0, glue_glVertexAttribPointer);
     EXPORT_PROCEDURE("enable-vertex-attrib-array", 1, 0, 0, glue_glEnableVertexAttribArray);
+
+    EXPORT_PROCEDURE("get-uniform-location", 2, 0, 0, glue_glGetUniformLocation);
+
+    EXPORT_PROCEDURE("uniform1f", 2, 0, 0, glue_glUniform1f);
+    EXPORT_PROCEDURE("uniform2f", 3, 0, 0, glue_glUniform2f);
+    EXPORT_PROCEDURE("uniform3f", 4, 0, 0, glue_glUniform3f);
+    EXPORT_PROCEDURE("uniform4f", 5, 0, 0, glue_glUniform4f);
+    EXPORT_PROCEDURE("uniform1ui", 2, 0, 0, glue_glUniform1ui);
+    EXPORT_PROCEDURE("uniform2ui", 3, 0, 0, glue_glUniform2ui);
+    EXPORT_PROCEDURE("uniform3ui", 4, 0, 0, glue_glUniform3ui);
+    EXPORT_PROCEDURE("uniform4ui", 5, 0, 0, glue_glUniform4ui);
+    EXPORT_PROCEDURE("uniform1i", 2, 0, 0, glue_glUniform1i);
+    EXPORT_PROCEDURE("uniform2i", 3, 0, 0, glue_glUniform2i);
+    EXPORT_PROCEDURE("uniform3i", 4, 0, 0, glue_glUniform3i);
+    EXPORT_PROCEDURE("uniform4i", 5, 0, 0, glue_glUniform4i);
+
+    EXPORT_PROCEDURE("uniform1fv", 2, 0, 0, glue_glUniform1fv);
+    EXPORT_PROCEDURE("uniform2fv", 2, 0, 0, glue_glUniform2fv);
+    EXPORT_PROCEDURE("uniform3fv", 2, 0, 0, glue_glUniform3fv);
+    EXPORT_PROCEDURE("uniform4fv", 2, 0, 0, glue_glUniform4fv);
+    EXPORT_PROCEDURE("uniform1uiv", 2, 0, 0, glue_glUniform1uiv);
+    EXPORT_PROCEDURE("uniform2uiv", 2, 0, 0, glue_glUniform2uiv);
+    EXPORT_PROCEDURE("uniform3uiv", 2, 0, 0, glue_glUniform3uiv);
+    EXPORT_PROCEDURE("uniform4uiv", 2, 0, 0, glue_glUniform4uiv);
+    EXPORT_PROCEDURE("uniform1iv", 2, 0, 0, glue_glUniform1iv);
+    EXPORT_PROCEDURE("uniform2iv", 2, 0, 0, glue_glUniform2iv);
+    EXPORT_PROCEDURE("uniform3iv", 2, 0, 0, glue_glUniform3iv);
+    EXPORT_PROCEDURE("uniform4iv", 2, 0, 0, glue_glUniform4iv);
+
+    EXPORT_PROCEDURE("uniform-matrix3", 3, 0, 0, glue_glUniformMatrix3);
+    EXPORT_PROCEDURE("uniform-matrix4", 3, 0, 0, glue_glUniformMatrix4);
+    
+    EXPORT_PROCEDURE("uniform-matrix3v", 3, 0, 0, glue_glUniformMatrix3v);
+    EXPORT_PROCEDURE("uniform-matrix4v", 3, 0, 0, glue_glUniformMatrix4v);
 
     EXPORT_PROCEDURE("draw-arrays", 3, 0, 0, glue_glDrawArrays);
 }
