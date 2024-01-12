@@ -14,7 +14,7 @@
 
 
 void* register_functions (void* data) {
-  init_glue_gl();
+  scm_c_define_module("gl", init_glue_gl, data);
 
   return NULL;
 }

@@ -1,0 +1,10 @@
+#pragma once
+
+#define EXPORT_CONSTANT(name, val) \
+    scm_c_define(name, val); \
+    scm_c_export(name);
+
+#define EXPORT_PROCEDURE(name, req, opt, rest, fn) \
+    scm_c_define_gsubr(name, req, opt, rest, fn); \
+    scm_c_export(name);
+    

@@ -1,6 +1,8 @@
-; (throw 'load-error "This file is not meant to be loaded")
+; (throw 'load-error "this is a test of exception handling")
+
 (use-modules (ice-9 textual-ports)
-             (srfi srfi-4))
+             (srfi srfi-4)
+             ((gl) #:prefix gl:))
 
 (define (print-ln . args)
   (for-each display args)

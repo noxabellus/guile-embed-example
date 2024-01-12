@@ -3,6 +3,8 @@
 #include <libguile.h>
 
 #include "glue-gl.h"
+#include "glueing-utils.h"
+
 
 char SHADER_INFO_LOG[SHADER_INFO_LOG_LENGTH] = {};
 
@@ -146,43 +148,42 @@ SCM glue_glDrawArrays (SCM mode, SCM first, SCM count) {
 
 
 
-void init_glue_gl () {
-    scm_c_define("gl:+float+", scm_from_int(GL_FLOAT));
-    scm_c_define("gl:+unsigned-int+", scm_from_int(GL_UNSIGNED_INT));
-    scm_c_define("gl:+int+", scm_from_int(GL_INT));
+void init_glue_gl (void*) {
+    EXPORT_CONSTANT("+float+", scm_from_int(GL_FLOAT));
+    EXPORT_CONSTANT("+unsigned-int+", scm_from_int(GL_UNSIGNED_INT));
+    EXPORT_CONSTANT("+int+", scm_from_int(GL_INT));
 
-    scm_c_define("gl:+vertex-shader+", scm_from_int(GL_VERTEX_SHADER));
-    scm_c_define("gl:+fragment-shader+", scm_from_int(GL_FRAGMENT_SHADER));
+    EXPORT_CONSTANT("+vertex-shader+", scm_from_int(GL_VERTEX_SHADER));
+    EXPORT_CONSTANT("+fragment-shader+", scm_from_int(GL_FRAGMENT_SHADER));
 
-    scm_c_define("gl:+array-buffer+", scm_from_int(GL_ARRAY_BUFFER));
-    scm_c_define("gl:+element-array-buffer+", scm_from_int(GL_ELEMENT_ARRAY_BUFFER));
+    EXPORT_CONSTANT("+array-buffer+", scm_from_int(GL_ARRAY_BUFFER));
+    EXPORT_CONSTANT("+element-array-buffer+", scm_from_int(GL_ELEMENT_ARRAY_BUFFER));
 
-    scm_c_define("gl:+stream-draw+", scm_from_int(GL_STREAM_DRAW));
-    scm_c_define("gl:+static-draw+", scm_from_int(GL_STATIC_DRAW));
-    scm_c_define("gl:+dynamic-draw+", scm_from_int(GL_DYNAMIC_DRAW));
+    EXPORT_CONSTANT("+stream-draw+", scm_from_int(GL_STREAM_DRAW));
+    EXPORT_CONSTANT("+static-draw+", scm_from_int(GL_STATIC_DRAW));
+    EXPORT_CONSTANT("+dynamic-draw+", scm_from_int(GL_DYNAMIC_DRAW));
 
-    scm_c_define("gl:+triangles+", scm_from_int(GL_TRIANGLES));
+    EXPORT_CONSTANT("+triangles+", scm_from_int(GL_TRIANGLES));
     
-    scm_c_define("gl:+color-buffer-bit+", scm_from_int(GL_COLOR_BUFFER_BIT));
-    scm_c_define("gl:+depth-buffer-bit+", scm_from_int(GL_DEPTH_BUFFER_BIT));
+    EXPORT_CONSTANT("+color-buffer-bit+", scm_from_int(GL_COLOR_BUFFER_BIT));
+    EXPORT_CONSTANT("+depth-buffer-bit+", scm_from_int(GL_DEPTH_BUFFER_BIT));
 
 
-
-    scm_c_define_gsubr("gl:clear-color", 4, 0, 0, glue_glClearColor);
-    scm_c_define_gsubr("gl:clear", 1, 0, 0, glue_glClear);
+    EXPORT_PROCEDURE("clear-color", 4, 0, 0, glue_glClearColor);
+    EXPORT_PROCEDURE("clear", 1, 0, 0, glue_glClear);
     
-    scm_c_define_gsubr("gl:make-shader", 2, 0, 0, glue_glMakeShader);
-    scm_c_define_gsubr("gl:make-program", 0, 0, 1, glue_glMakeProgram);
-    scm_c_define_gsubr("gl:use-program", 1, 0, 0, glue_glUseProgram);
+    EXPORT_PROCEDURE("make-shader", 2, 0, 0, glue_glMakeShader);
+    EXPORT_PROCEDURE("make-program", 0, 0, 1, glue_glMakeProgram);
+    EXPORT_PROCEDURE("use-program", 1, 0, 0, glue_glUseProgram);
 
-    scm_c_define_gsubr("gl:gen-buffer", 0, 0, 0, glue_glGenBuffer);
-    scm_c_define_gsubr("gl:bind-buffer", 2, 0, 0, glue_glBindBuffer);
-    scm_c_define_gsubr("gl:buffer-data", 3, 0, 0, glue_glBufferData);
+    EXPORT_PROCEDURE("gen-buffer", 0, 0, 0, glue_glGenBuffer);
+    EXPORT_PROCEDURE("bind-buffer", 2, 0, 0, glue_glBindBuffer);
+    EXPORT_PROCEDURE("buffer-data", 3, 0, 0, glue_glBufferData);
 
-    scm_c_define_gsubr("gl:gen-vertex-array", 0, 0, 0, glue_glGenVertexArray);
-    scm_c_define_gsubr("gl:bind-vertex-array", 1, 0, 0, glue_glBindVertexArray);
-    scm_c_define_gsubr("gl:vertex-attrib-pointer", 5, 0, 0, glue_glVertexAttribPointer);
-    scm_c_define_gsubr("gl:enable-vertex-attrib-array", 1, 0, 0, glue_glEnableVertexAttribArray);
+    EXPORT_PROCEDURE("gen-vertex-array", 0, 0, 0, glue_glGenVertexArray);
+    EXPORT_PROCEDURE("bind-vertex-array", 1, 0, 0, glue_glBindVertexArray);
+    EXPORT_PROCEDURE("vertex-attrib-pointer", 5, 0, 0, glue_glVertexAttribPointer);
+    EXPORT_PROCEDURE("enable-vertex-attrib-array", 1, 0, 0, glue_glEnableVertexAttribArray);
 
-    scm_c_define_gsubr("gl:draw-arrays", 3, 0, 0, glue_glDrawArrays);
+    EXPORT_PROCEDURE("draw-arrays", 3, 0, 0, glue_glDrawArrays);
 }

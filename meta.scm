@@ -1,8 +1,13 @@
-#! /usr/bin/csi -script
+#! /usr/bin/guile -s
+!#
 
-(import (scheme base)
-        (scheme process-context)
-        (prefix (shell) shell:))
+(define (shell:run . arg-lists)
+    (define (fix-arg a)
+        (if (symbol? a)
+            (symbol->string a)
+            a))
+    (define fixed-lists (map (lambda (args) (map fix-arg args)) arg-lists))
+    (for-each (lambda (args) (apply system* args)) fixed-lists))
 
 (define args (cdr (command-line)))
 
@@ -17,11 +22,11 @@
         -Isrc/include
         -I/usr/include/guile/3.0))
 
-(define (run) (shell:run (./build/main)))
+(define (run) (shell:run '(./build/main)))
 (define (build)
     (clean)
-    (shell:run (mkdir build) ,build-cmd))
-(define (clean) (shell:run (rm -rf build)))
+    (shell:run '(mkdir build) build-cmd))
+(define (clean) (shell:run '(rm -rf build)))
 (define (help exit-code)
     (display "Usage: ./meta.scm [help | run | build | build-and-run | clean]\n")
     (exit exit-code))
