@@ -21,7 +21,9 @@ Build and run the program:
 ```sh
 ./meta.scm build-and-run
 ```
-More info:
+Configuration for meta can be found in `config.scm`
+
+More commands for meta can be found by running:
 ```sh
 ./meta.scm help
 ```

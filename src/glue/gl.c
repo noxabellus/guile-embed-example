@@ -2,7 +2,7 @@
 #include <GL/glew.h>
 #include <libguile.h>
 
-#include "glue-gl.h"
+#include "glue/gl.h"
 #include "glueing-utils.h"
 
 
