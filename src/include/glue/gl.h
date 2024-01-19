@@ -10,4 +10,6 @@ GLuint glMakeShader (GLenum type, const char* source);
 GLuint glMakeProgram (size_t count, GLuint* shaders);
 
 
-void bind_gl_glue(void*);
+void bind_gl_glue (void*);
+
+void clear_gl_data ();

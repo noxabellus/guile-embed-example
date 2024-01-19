@@ -57,7 +57,7 @@
     (define args (cdr (command-line)))
 
     (unless (= 1 (length args)) (help 1))
-        
+
     (case (string->symbol (car args))
         ((help) (help 0))
         ((run) (run))

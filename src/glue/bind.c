@@ -11,3 +11,8 @@ Model* bind_glue (Model* model) {
 
   return model;
 }
+
+void clear_model_data () {
+  clear_gl_data();
+  clear_sdl_data();
+}
