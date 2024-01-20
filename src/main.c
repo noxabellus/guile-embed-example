@@ -20,7 +20,9 @@ SCM handle_exn (void*, SCM key, SCM args) {
     char* key_s = scm_to_utf8_string(str);
     char* args_s = scm_to_utf8_string(str2);
 
-    panic("'%s exception in script: %s\n", key_s, args_s);
+    printf("'%s exception in script: %s\n", key_s, args_s);
+    scm_backtrace();
+    exit(1);
 }
 
 SCM run_scm (scm_t_catch_body body, void* body_data) {
