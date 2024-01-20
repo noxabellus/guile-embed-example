@@ -53,17 +53,17 @@
         ,@(map (symbol-prefixer '-l) libraries)
         ,@(map (symbol-prefixer '- 'I) include-paths)))
 
-(define (runner)
-    (define args (cdr (command-line)))
+(define args (cdr (command-line)))
 
-    (unless (= 1 (length args)) (help 1))
+(define (runner)
+    (define (too-many) (unless (= 1 (length args)) (help 1)))
 
     (case (string->symbol (car args))
         ((help) (help 0))
         ((run) (run))
-        ((build) (build))
+        ((build) (begin (too-many) (build)))
         ((build-and-run) (begin (build) (run)))
-        ((clean) (clean))
+        ((clean) (begin (too-many) (clean)))
         (else (help 1))))
 
 (define (debug arg)
@@ -101,7 +101,7 @@
     (concatenate (map (lambda (dir) (traverse '() dir)) (map symbol->string dirs))))
 
 (define (run)
-    (shell-run '(./build/main)))
+    (shell-run `(./build/main ,@(cdr args))))
 
 (define (build)
     (clean)
@@ -111,7 +111,7 @@
     (shell-run '(rm -rf build)))
 
 (define (help exit-code)
-    (display "Usage: ./meta.scm [help | run | build | build-and-run | clean]\n")
+    (display "Usage: ./meta.scm [help | run | build | build-and-run | clean] [arg for run]*\n")
     (exit exit-code))
 
 (runner)
